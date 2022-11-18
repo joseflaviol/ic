@@ -16,7 +16,7 @@ class Graph:
     def getE(self):
         return self.E 
 
-    def addEdge(self, u, v):
+    def addEdge(self, u, v, w = 0):
         self.adjacency_list[u].append(v)
         if not self.oriented:
             self.adjacency_list[v].append(u)

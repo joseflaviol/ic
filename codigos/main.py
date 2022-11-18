@@ -1,4 +1,6 @@
 from graph import Graph
+from edge_weighted_graph import EdgeWeightedGraph
+from steiner_tree import SteinerTree
 from dfs import DepthFirstSearch
 from npe import NPE
 
@@ -35,4 +37,17 @@ def main():
     print("node: " + str(N))
     print("depth: " + str(D))
 
-main()
+def main2():
+
+    g = EdgeWeightedGraph(6, 8)
+
+    g.addEdge(0, 1, 5)
+    g.addEdge(0, 2, 3)
+    g.addEdge(1, 2, 10)
+    g.addEdge(2, 3, 1)
+    g.addEdge(3, 4, 50)
+    g.addEdge(4, 1, 30)
+    g.addEdge(0, 3, 40)
+    g.addEdge(4, 5, 100)
+
+main2()
