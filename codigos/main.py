@@ -3,46 +3,49 @@ from dfs import DepthFirstSearch
 from npe import NPE
 
 def main():
-    g = Graph(oriented = False)
+    
+    vertices, arestas = (int(x) for x in input().split())
 
-    g.setV(17)
+    g = Graph(vertices)
 
-    g.addEdge(0, 1)
-    g.addEdge(1, 3)
-    g.addEdge(3, 16)
-    g.addEdge(0, 2)
-    g.addEdge(2, 4)
-    g.addEdge(4, 5)
-    g.addEdge(5, 6)
-    g.addEdge(6, 9)
-    g.addEdge(9, 10)
-    g.addEdge(5, 7)
-    g.addEdge(7, 8)
-    g.addEdge(4, 13)
-    g.addEdge(4, 14)
-    g.addEdge(4, 15)
-    g.addEdge(2, 11)
-    g.addEdge(0, 12)
+    for _ in range(arestas):
+        discard, u, v, w = input().split()
+        g.addEdge(int(u) - 1, int(v) - 1, int(w))
+    
+    t = int(input())
+    terminais = []
 
-    #print(g)
+    for i in range(t):
+        discard, ti = input().split()
+        terminais.append(int(ti) - 1) 
 
-    dfs = DepthFirstSearch(g, 0)
+    print(terminais)
 
-    print("node: " + str(dfs.getNPE()["node"]))
-    print("depth: " + str(dfs.getNPE()["depth"]))
+    npe = NPE(g, terminais)
 
-    npe = NPE(g)
+    custo, arestas = npe.decode()
 
-    print(npe.decode())
+    print(custo)
 
-    (N, D) = npe.SPRN(6, 3)
+    menor = custo
+    redux_rate = 0.2
 
-    print("node: " + str(N))
-    print("depth: " + str(D))
-
-    (N, D) = npe.TBRN2(5, 10, 3)
-
-    print("node: " + str(N))
-    print("depth: " + str(D))
+    for _ in range(50):
+        npe = NPE(g, terminais)
+        for _ in range(30):
+            #n, d = npe.SPRN()
+            npe.SPRN()
+            n, d = npe.TBRN()
+            #print(n)
+            #print(d)
+            npe.setN(n)
+            npe.setD(d)
+            npe.redux(redux_rate)
+            custo, _ = npe.decode()
+            if custo < menor:
+                menor = custo
+            print(custo)
+    
+    print("Menor: %d" % (menor))
 
 main()

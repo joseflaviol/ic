@@ -1,37 +1,14 @@
 class Graph:
 
-    def __init__(self, oriented = False):
-        self.V, self.E, self.oriented = None, None, oriented
-    
-    def setV(self, V):
-        self.V = V
-        self.adjacency_list = []
-        for i in range(V):
-            self.adjacency_list.append([]) 
-        self.E = 0 
-    
-    def getV(self):
-        return self.V 
-    
-    def getE(self):
-        return self.E 
+    def __init__(self, v):
+        self.v = v
+        self.adj_list = []
+        for _ in range(v):
+            self.adj_list.append({})       
 
-    def addEdge(self, u, v, w = 0):
-        self.adjacency_list[u].append(v)
-        if not self.oriented:
-            self.adjacency_list[v].append(u)
-        self.E += 1
-    
+    def addEdge(self, u, v, w = 1):
+        self.adj_list[u][v] = w 
+        self.adj_list[v][u] = w
+
     def adj(self, u):
-        return self.adjacency_list[u]
-    
-    def __str__(self):
-        s = str(self.getV()) + " vertices, " + str(self.getE()) + " edges\n"
-
-        for i in range(self.getV()):
-            s += str(i) + ": "
-            for v in self.adj(i):
-                s += str(v) + " "
-            s += "\n"
-        
-        return s
+        return self.adj_list[u]

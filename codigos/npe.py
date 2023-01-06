@@ -1,40 +1,67 @@
+import random
 from dfs import DepthFirstSearch
 
 class NPE:
 
-    def __init__(self, G):
-        dfs = DepthFirstSearch(G, 0)
-        self.npe = dfs.getNPE()
+    def __init__(self, G, terminals):
+        self.G = G
+        self.terminals = terminals
+        self.s = random.randint(0, G.v - 1)
+        dfs = DepthFirstSearch(G, self.s, terminals)
+        self.n, self.d = dfs.NPE()
     
+    def setN(self, n):
+        self.n = n 
+    
+    def setD(self, d):
+        self.d = d
+
     def get(self):
-        return self.npe
+        return (self.n, self.d)
 
     def decode(self):
-        N = len(self.npe["node"])
-        n = self.npe["node"]
-        d = self.npe["depth"]
+        custo = 0
+        N = len(self.n)
+        n = self.n
+        d = self.d
         edges = []
-        lookup = [0] * N
+        lookup = [self.s] * N
 
         for i in range(1, N):
             j = lookup[d[i] - 1]
             edges.append((j, n[i]))
+            custo += self.G.adj(j)[n[i]]
             lookup[d[i]] = n[i]
         
-        return edges
+        return (custo, edges)
     
-    def SPRN(self, p, a):
-        n = self.npe["node"]
-        d = self.npe["depth"]
+    def SPRN(self):
+        n = self.n
+        d = self.d
 
-        ia = n.index(a)
-        ip = n.index(p)
+        ip = random.randint(1, len(n) - 1)
+        
         il = ip + 1
 
         while il < len(n) and d[il] > d[ip]:
             il = il + 1
         
         rp = range(ip, il)
+
+        ia = None 
+        aux = 0
+
+        while ia == None and aux < 10:
+            try:
+                ia = n.index( random.choice(list( self.G.adj(n[ip]).keys() )))
+                if ia in rp:
+                    ia = None 
+            except ValueError:
+                ia = None 
+            aux += 1
+        
+        if ia == None:
+            return (n, d)
 
         N = []
         D = []
@@ -61,27 +88,46 @@ class NPE:
             -   aleatorizar a escolha da aresta (r, a) (checar artigo)
     '''
 
-    def TBRN2(self, p, r, a):
-        n = self.npe["node"]
-        d = self.npe["depth"]
+    def TBRN(self):
+        n = self.n
+        d = self.d
 
-        ip = n.index(p)
-        ir = n.index(r)
-        ia = n.index(a)
+        ip = random.randint(1, len(n) - 1)
 
         ep = ip + 1
-        rp = [p] 
+        rp = [n[ip]] 
 
         while ep < len(n) and d[ep] > d[ip]:
             rp.append(n[ep])
             ep += 1
 
+        rp_aux = range(ip, ep)
+
+        ir = random.randint(ip, ep - 1)
+
         er = ir + 1
-        rr = [r] 
+        rr = [n[ir]]
 
         while er < len(n) and d[er] > d[ir]:
             rr.append(n[er])
             er += 1
+
+        rr_aux = range(ir, er) 
+
+        ia = None 
+        aux = 0
+
+        while ia == None and aux < 10:
+            try:
+                ia = n.index( random.choice(list( self.G.adj(n[ir]).keys() )))
+                if ia in rr_aux or ia in rp_aux:
+                    ia = None 
+            except ValueError:
+                ia = None 
+            aux += 1
+        
+        if ia == None:
+            return (n, d)
 
         Ntmp = []
         Dtmp = []
@@ -133,3 +179,27 @@ class NPE:
 
         return (N, D)
     
+    def isTerminal(self, v):
+        return v in self.terminals
+
+    def isLeaf(self, i):
+        for j in range(i + 1, len(self.n)):
+            if self.d[j] == self.d[i] + 1:
+                return False 
+        return True
+ 
+    def father(self, i):
+        f = None 
+        for j in range(i - 1, -1, -1):
+            if self.d[j] == self.d[i] - 1:
+                f = j
+                break 
+        return f
+
+    def redux(self, redux_rate):
+        for i in range(len(self.n) - 1, -1, -1):
+            if not self.isTerminal(self.n[i]) and self.isLeaf(i): #and not self.isTerminal(n[self.father(i)]):
+                r = random.randint(0, 10) / 100
+                if r < redux_rate:
+                    del self.n[i]
+                    del self.d[i]
